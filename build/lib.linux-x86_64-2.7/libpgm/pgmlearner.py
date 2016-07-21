@@ -32,12 +32,12 @@ import itertools
 try:
     import numpy as np
 except ImportError:
-    raise ImportError("numpy is not installed on your system.")
+    raise ImportError, "numpy is not installed on your system."
 
 try: 
     from scipy.stats import chisquare
 except ImportError:
-    raise ImportError("scipy is not installed on your system.")
+    raise ImportError, "scipy is not installed on your system."
 
 
 from graphskeleton import GraphSkeleton

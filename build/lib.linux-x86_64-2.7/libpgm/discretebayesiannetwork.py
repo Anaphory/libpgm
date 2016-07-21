@@ -84,7 +84,8 @@ class DiscreteBayesianNetwork(OrderedSkeleton):
     
                 '''
             except:
-                raise Exception("Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata attribute.")
+                raise Exception, "Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata attribute."
+
             # check that inputs match up
             assert (sorted(self.V) == sorted(self.Vdata.keys())), ("Vertices did not match vertex data:", self.V, self.Vdata.keys())
 

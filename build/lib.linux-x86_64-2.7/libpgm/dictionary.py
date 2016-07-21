@@ -78,7 +78,7 @@ class Dictionary(object):
                 ftext = ftext.replace('.', '0.')
                 self.alldata = json.loads(ftext)
             except ValueError:
-                raise ValueError("Convert to JSON from input file failed. Check formatting.")
+                raise ValueError, "Convert to JSON from input file failed. Check formatting."
         f.close()
         
         assert isinstance(self.alldata, dict), "In method dictload, path did not direct to a proper text file."

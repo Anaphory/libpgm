@@ -86,7 +86,7 @@ class DynDiscBayesianNetwork(OrderedSkeleton):
                 self.twotbn_Vdata = nodedata.twotbn_Vdata
                 '''A dictionary containing CPD data for the Bayesian network for time intervals greater than 0.'''
             except:
-                raise Exception("Inputs were malformed; first arg must contain V and E attributes and second arg must contain initial_Vdata and twotbn_Vdata attributes.")
+                raise Exception, "Inputs were malformed; first arg must contain V and E attributes and second arg must contain initial_Vdata and twotbn_Vdata attributes."
 
             # check that inputs match up
             assert (sorted(self.V) == sorted(self.initial_Vdata.keys())), ("initial_Vdata vertices did not match vertex data:", self.V, self.Vdata.keys())

@@ -232,7 +232,7 @@ class TableCPDFactor(object):
         try:
             index = self.inputbn.Vdata[vertex]['vals'].index(value)
         except:
-            raise Exception("Second arg was not a possible value of first arg.")
+            raise Exception, "Second arg was not a possible value of first arg."
      
         # machinery that calculates values in summed out factor
         k = 0

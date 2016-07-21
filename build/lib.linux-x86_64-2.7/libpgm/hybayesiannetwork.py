@@ -67,7 +67,7 @@ class HyBayesianNetwork(OrderedSkeleton):
                 self.nodes = nodedata.nodes
                 '''A dictionary of {key: value} pairs linking the node name (the key) to a class instance (the value) representing the node, its node data, and its sampling function.'''
             except:
-                raise Exception("Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata and nodes attributes.")
+                raise Exception, "Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata and nodes attributes."
 
             # check that inputs match up
             assert sorted(self.V) == sorted(self.Vdata.keys()), "Node data did not match graph skeleton nodes."
