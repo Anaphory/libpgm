@@ -27,7 +27,7 @@ This module provides tools for creating and using factorized representations of 
 
 '''
 
-from tablecpdfactor import TableCPDFactor
+from .tablecpdfactor import TableCPDFactor
 
 import random
 import copy

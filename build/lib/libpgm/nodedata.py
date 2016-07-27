@@ -27,7 +27,7 @@ A module for creating and managing node data. Node data in this library can have
 
 '''
 
-from dictionary import Dictionary
+from .dictionary import Dictionary
 
 class NodeData(Dictionary):
     '''

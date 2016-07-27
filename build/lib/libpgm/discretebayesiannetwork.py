@@ -32,8 +32,8 @@ import json
 import sys
 from utils.libpgmexceptions import *
 import utils.bntextutils as bntutils
-from orderedskeleton import OrderedSkeleton
-from tablecpdfactorization import TableCPDFactorization
+from .orderedskeleton import OrderedSkeleton
+from .tablecpdfactorization import TableCPDFactorization
 
 class DiscreteBayesianNetwork(OrderedSkeleton):
     '''

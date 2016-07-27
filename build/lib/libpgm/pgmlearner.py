@@ -40,10 +40,10 @@ except ImportError:
     raise ImportError("scipy is not installed on your system.")
 
 
-from graphskeleton import GraphSkeleton
-from discretebayesiannetwork import DiscreteBayesianNetwork
-from lgbayesiannetwork import LGBayesianNetwork
-from sampleaggregator import SampleAggregator
+from .graphskeleton import GraphSkeleton
+from .discretebayesiannetwork import DiscreteBayesianNetwork
+from .lgbayesiannetwork import LGBayesianNetwork
+from .sampleaggregator import SampleAggregator
 
 class PGMLearner():
     '''

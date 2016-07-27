@@ -32,7 +32,7 @@ This method allows for the construction of a Bayesian network with every combina
 import random
 import sys
 
-from orderedskeleton import OrderedSkeleton
+from .orderedskeleton import OrderedSkeleton
 
 class HyBayesianNetwork(OrderedSkeleton):
     '''

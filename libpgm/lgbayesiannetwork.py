@@ -39,7 +39,7 @@ import random
 import math
 import sys
 
-from orderedskeleton import OrderedSkeleton
+from .orderedskeleton import OrderedSkeleton
 
 class LGBayesianNetwork(OrderedSkeleton):
     '''
