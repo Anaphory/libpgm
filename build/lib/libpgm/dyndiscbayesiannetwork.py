@@ -158,8 +158,12 @@ class DynDiscBayesianNetwork(OrderedSkeleton):
                             pvalues.append(str(outcome[parent]))
                     for pvalue in pvalues:
                         assert pvalue != 'default', "Graph skeleton was not topologically ordered."
-                       
-                    distribution = Vdataentry["cprob"][str(pvalues)]
+                    key = str(pvalues)
+                    try:
+                        distribution = Vdataentry["cprob"][key]
+                    except KeyError:
+                        key = key.replace(" ","  ")
+                        distribution = Vdataentry["cprob"][key]
 
                 # choose interval
                 rand = random.random()
