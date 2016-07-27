@@ -412,7 +412,7 @@ class PGMLearner():
         assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
 
         # instantiate array of variables and array of potential dependencies
-        variables = data[0].keys()
+        variables = list(data[0].keys())
         ovariables = variables[:]
         dependencies = []
         for x in variables:

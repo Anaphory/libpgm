@@ -140,7 +140,8 @@ class TableCPDFactor(object):
         assignment = [0 for l in range(len(result["scope"]))]
         result["vals"] = []
         for _ in range(possiblevals):
-            result["vals"].append(int(self.vals[j] * other.vals[k]))
+            result["vals"].append(self.vals[int(j)] * other.vals[int(k)])
+            
             for l in range(len(result["scope"])):
                 assignment[l] = assignment[l] + 1
                 if (assignment[l] == result["card"][l]):
@@ -195,7 +196,7 @@ class TableCPDFactor(object):
         vscope = self.scope.index(vertex)
         vstride = self.stride[vertex]
         vcard = self.card[vscope]
-        result = [0 for i in range(len(self.vals)/self.card[vscope])]
+        result = [0 for i in range(len(self.vals)//self.card[vscope])]
         
         # machinery that calculates values in summed out factor
         k = 0
@@ -204,7 +205,8 @@ class TableCPDFactor(object):
             lcardproduct *= self.card[i]
         for i in range(len(result)):
             for h in range(vcard):
-                result[i] += self.vals[k + (vstride * h)]
+                result[i] += self.vals[k + int(vstride * h)]
+                
             k += 1
             if (k % lcardproduct == 0):
                 k += (lcardproduct * (vcard - 1))
