@@ -202,9 +202,13 @@ class DiscreteBayesianNetwork(OrderedSkeleton):
                     pvalues = [str(outcome[t]) for t in Vdataentry["parents"]] # ideally can we pull this from the skeleton so as not to store parent data at all?
                     for pvalue in pvalues:
                         assert pvalue != 'default', "Graph skeleton was not topologically ordered."
-                       
-                    distribution = Vdataentry["cprob"][str(pvalues)]
-
+                        key = str(pvalues)
+                        try:
+                            distribution = Vdataentry["cprob"][key]
+                        except KeyError:
+                            key = key.replace(" ","  ")
+                            distribution = Vdataentry["cprob"][key]
+                            
                 # choose interval
                 rand = random.random()
                 lbound = 0 

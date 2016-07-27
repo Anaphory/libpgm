@@ -125,8 +125,8 @@ class NodeData(Dictionary):
             
             # import module containing class
             path = str(self.Vdata[entry]["type"])
-            exec("import CPDtypes." + path + " as " + path)
-
+            exec("from libpgm.CPDtypes import " + path)
+            
             # instantiate class
             exec("tmpnode = " + path + "." + str.capitalize(path) + "(self.Vdata[entry])")
 

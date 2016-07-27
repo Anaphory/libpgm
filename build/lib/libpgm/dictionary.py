@@ -71,7 +71,7 @@ class Dictionary(object):
 
         if not loaded:
             try: 
-                ftext = ftext.translate(None, '\t\n ')
+                ftext = ftext.translate('\t\n ')
                 ftext = ftext.replace(':', ': ')
                 ftext = ftext.replace(',', ', ')
                 ftext = ftext.replace('None', 'null')

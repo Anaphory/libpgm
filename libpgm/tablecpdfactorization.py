@@ -406,14 +406,17 @@ class TableCPDFactorization():
                 for othernode in order:
                     if (othernode != node and relevantfactors[0].scope.count(othernode) > 0):
                         relevantfactors[0].reducefactor(othernode, current[othernode])
-                
-                # renormalize
-                summ = 0
-                for val in relevantfactors[0].vals:
-                    summ += val
-                for x in range(len(relevantfactors[0].vals)):
-                    relevantfactors[0].vals[x] /= summ
-                
+
+                if not all([val==0 for val in relevantfactors[0].vals]):
+                #if not all relevantfactors[0].vals equal zero
+                #if they do all equal 0, no reason to renormalize
+                    # renormalize
+                    summ = 0
+                    for val in relevantfactors[0].vals:
+                        summ += val
+                    for x in range(len(relevantfactors[0].vals)):
+                        relevantfactors[0].vals[x] /= summ
+
                 # convert random number
                 val = random.random()
                 lboundary = 0

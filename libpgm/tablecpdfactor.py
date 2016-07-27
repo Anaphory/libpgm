@@ -51,8 +51,14 @@ class TableCPDFactor(object):
         # add values
         def explore(_dict, key, depth, totaldepth):
             if depth == totaldepth:
-                for x in _dict[str(key)]:
-                    result["vals"].append(x)
+                try:
+                    for x in _dict[str(key)]:
+                        result["vals"].append(x)
+                except KeyError:
+                    key = str(key)
+                    key = key.replace(" ","  ")
+                    for x in _dict[key]:
+                        result["vals"].append(x)
                 return
             else:
                 for val in bn.Vdata[bn.Vdata[vertex]["parents"][depth]]["vals"]:
@@ -134,7 +140,7 @@ class TableCPDFactor(object):
         assignment = [0 for l in range(len(result["scope"]))]
         result["vals"] = []
         for _ in range(possiblevals):
-            result["vals"].append(self.vals[j] * other.vals[k])
+            result["vals"].append(int(self.vals[j] * other.vals[k]))
             for l in range(len(result["scope"])):
                 assignment[l] = assignment[l] + 1
                 if (assignment[l] == result["card"][l]):
@@ -226,7 +232,8 @@ class TableCPDFactor(object):
         vscope = self.scope.index(vertex)
         vstride = self.stride[vertex]
         vcard = self.card[vscope]
-        result = [0 for i in range(len(self.vals)/self.card[vscope])]
+        
+        result = [0 for i in range(len(self.vals)//self.card[vscope])]
         
         # added step: find value index from evidence
         try:
@@ -240,7 +247,7 @@ class TableCPDFactor(object):
         for i in range(vscope):
             lcardproduct *= self.card[i]
         for i in range(len(result)):
-            result[i] += self.vals[k + (vstride * index)]
+            result[i] += self.vals[k + int(vstride * index)]
             k += 1
             if (k % lcardproduct == 0):
                 k += (lcardproduct * (vcard - 1))
