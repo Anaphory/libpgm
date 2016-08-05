@@ -30,8 +30,8 @@ This module provides tools to represent and handle Bayesian networks with discre
 import random
 import json
 import sys
-from utils.libpgmexceptions import *
-import utils.bntextutils as bntutils
+from .utils.libpgmexceptions import *
+from .utils import bntextutils as bntutils
 from .orderedskeleton import OrderedSkeleton
 from .tablecpdfactorization import TableCPDFactorization
 
