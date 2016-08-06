@@ -82,13 +82,11 @@ class DiscreteBayesianNetwork(GraphSkeleton):
             """
                 # validate
             with open(path) as f:
-                try:
                     j = json.load(f)
-                except: 
-                    raise bntextError("json not properly formatted: failed to load")
             bntutils.refresh(path)
             bntutils._validate(path)
 
+            self = c()
             # load
             self.V = j["V"]
             self.E = j["E"]
@@ -116,15 +114,12 @@ class DiscreteBayesianNetwork(GraphSkeleton):
             }
 
         '''
-        # validate
-        if not (hasattr(self, "V") and hasattr(self, "E") and hasattr(self, "Vdata")):
-            raise notloadedError("Bayesian network is missing essential attributes")
-        assert isinstance(query, dict) and isinstance(evidence, dict), "query and evidence must be dicts"
-        for k in query.keys():
-            assert isinstance(query[k], list), "the values of your query must be lists, even if singletons" 
-
         # calculate
-        fn = TableCPDFactorization(self)
+        try:
+            fn = self._fn
+        except AttributeError:
+            fn = TableCPDFactorization(self)
+            self._fn = fn
         return fn.specificquery(query, evidence)
             
     def randomsample(self, n, evidence=None):
@@ -220,4 +215,4 @@ class DiscreteBayesianNetwork(GraphSkeleton):
             
             seq.append(outcome)
         return seq
-        
+

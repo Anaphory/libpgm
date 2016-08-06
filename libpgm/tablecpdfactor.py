@@ -22,8 +22,9 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
-This module provides tools for creating and using an individual factorized representation of a node. See description of factorized representations in :doc:`tablecpdfactorization`.
+'''This module provides tools for creating and using an individual
+factorized representation of a node. See description of factorized
+representations in :doc:`tablecpdfactorization`.
 
 '''
 
@@ -45,7 +46,11 @@ class TableCPDFactor(object):
         self.inputbn = bn
         '''The :doc:`DiscreteBayesianNetwork <discretebayesiannetwork>` instance that the vertex lives in.'''
         
-        result = dict( vals = [], stride = dict(), card = [], scope = [])
+        result = dict(
+            vals = [],
+            stride = {},
+            card = [],
+            scope = [])
         root = bn.Vdata[vertex]["cprob"]
 
         parents = bn.Vdata[vertex]["parents"]

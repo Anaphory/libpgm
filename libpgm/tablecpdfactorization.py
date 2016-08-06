@@ -33,9 +33,10 @@ import random
 import copy
 
 class TableCPDFactorization():
-    '''
-    This class represents a factorized Bayesian network with discrete CPD tables. It contains the attributes *bn*, *originalfactorlist*, and *factorlist*, and the methods *refresh*, *sumproductve*, *sumproducteliminatevar*, *condprobve*, *specificquery*, and *gibbssample*.
+    '''Factorized discrete CPD Bayesian Network.
 
+    This class represents a factorized Bayesian network with discrete
+    CPD tables. 
     '''
 
     def __init__(self, bn):
@@ -43,8 +44,6 @@ class TableCPDFactorization():
         This class is constructed with a :doc:`DiscreteBayesianNetwork <discretebayesiannetwork>` instance as argument. First, it takes the input itself and stores it in the *bn* attribute. Then, it transforms the information of each of these nodes from standard discrete CPD form into a :doc:`TableCPDFactor <tablecpdfactor>` isntance and stores the instances in an array in the attribute *originalfactorlist*. Finally, it makes a copy of this list to work with and stores it in *factorlist*.
         
         '''
-        assert hasattr(bn, "V") and hasattr(bn, "E") and hasattr(bn, "Vdata"), \
-            "Input must be a DiscreteBayesianNetwork instance."
         
         self.bn = bn
         '''The Bayesian network used as argument at instantiation.'''
@@ -66,8 +65,12 @@ class TableCPDFactorization():
         self.factorlist = copy.deepcopy(self.originalfactorlist)    
             
     def sumproducteliminatevar(self, vertex):    
-        '''
-        Multiply the all the factors in *factorlist* that have *vertex* in their scope, then sum out *vertex* from the resulting product factor. Replace all factors that were multiplied together with the resulting summed-out product.
+        '''Marginalize over all values of *vertex*
+
+        Multiply the all the factors in *factorlist* that have
+        *vertex* in their scope, then sum out *vertex* from the
+        resulting product factor. Replace all factors that were
+        multiplied together with the resulting summed-out product.
         
         Arguments:
             1. *vertex* - The name of the variable to eliminate.
