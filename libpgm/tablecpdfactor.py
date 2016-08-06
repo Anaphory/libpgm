@@ -275,7 +275,84 @@ class oldTableCPDFactor(object):
         return copy
 
 class TableCPDFactor (oldTableCPDFactor):
-    """A cleaner TableCPDFactor implementation"""
+    """Factorized representation of a CPD table.
+
+    This class represents a factorized representation of a conditional
+    probability distribution table.
+
+    """
+    def __init__(self, vertex, bn):
+        '''Construct a factorized CPD table from a vertex in a discrete
+        Bayesian network.
+
+        This class is constructed with a
+        :doc:`DiscreteBayesianNetwork <discretebayesiannetwork>`
+        instance and a *vertex* name as arguments. First it stores
+        these inputs in *inputvertex* and *inputbn*. Then, it creates
+        a factorized representation of *vertex*, storing the values in
+        *vals*, the names of the variables involved in *scope* the
+        cardinality of each of these variables in *card* and the
+        stride of each of these variables in *stride*.
+
+        '''
+        self.inputvertex = vertex
+        '''The name of the vertex.'''
+        self.inputbn = bn
+        '''The :doc:`DiscreteBayesianNetwork <discretebayesiannetwork>` instance that the vertex lives in.'''
+        
+        vals = []
+        stride = {}
+        card = []
+        scope = []
+        root = bn.Vdata[vertex]["cprob"]
+
+        parents = bn.Vdata[vertex]["parents"]
+        # add values
+        def explore(_dict, key, depth, totaldepth):
+            if depth == totaldepth:
+                    for x in _dict[key]:
+                        vals.append(x)
+                    return
+            else:
+                for val in bn.Vdata[parents[depth]]["vals"]:
+                    ckey = key + (val,)
+                    explore(_dict, ckey, depth+1, totaldepth)
+                    
+        if not parents:
+            vals = bn.Vdata[vertex]["cprob"]
+        else: 
+            td = len(parents)
+            explore(root, (), 0, td)
+        
+        # add cardinalities
+        card.append(bn.Vdata[vertex]["numoutcomes"])
+        if (bn.Vdata[vertex]["parents"] != None):
+            for parent in reversed(bn.Vdata[vertex]["parents"]):
+                card.append(bn.Vdata[parent]["numoutcomes"])
+            
+        # add scope
+        scope.append(vertex)
+        if (bn.Vdata[vertex]["parents"] != None):
+            for parent in reversed(bn.Vdata[vertex]["parents"]):
+                scope.append(parent)
+        
+        
+        # add strides
+        t_stride = 1
+        stride = dict()
+        for x in range(len(scope)):
+            stride[scope[x]] = (t_stride)
+            stride *= bn.Vdata[scope[x]]["numoutcomes"]
+        
+        self.vals = vals
+        '''A flat array of all the values from the CPD.'''
+        self.scope = scope
+        '''An array of vertices that affect the vals found in *vals*. Normally, this is the node itself and its parents.'''
+        self.card = card
+        '''A list of the cardinalities of each vertex in scope, where cardinality is the number of values that the vertex may take. The cardinalities are indexed according to the vertex's index in *scope*.'''
+        self.stride = stride
+        '''A dict of {vertex: value} pairs for each vertex in *scope*, where vertex is the name of the vertex and value is the stride of that vertex in the *vals* array.'''
+        
 
     def multiplyfactor(self, other):  # cf. PGM 359 
         '''Multiply this factor by another Factor
