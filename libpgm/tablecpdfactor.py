@@ -120,9 +120,6 @@ class oldTableCPDFactor(object):
         For more information cf. Koller et al. 359.
 
         '''
-        if (not isinstance(other, TableCPDFactor)):
-            msg = "Error: in method 'multiplyfactor', input was not a TableCPDFactor instance"
-            sys.exit(msg)
         j = 0
         k = 0
         result = dict()
@@ -310,39 +307,36 @@ class TableCPDFactor (oldTableCPDFactor):
                 result["scope"].append(scope)
                 result["card"].append(card)
     
-        # calculate possible combinations of scope variables
-        possiblevals = prod(result["card"])
-        
         # algorithm (see book)
-        assignment = [0 for l in result["scope"]]
+        assignment = {}
         result["vals"] = []
         j = 0
         k = 0
-        for _ in range(possiblevals):
+        for _ in range(prod(result["card"])):
             result["vals"].append(
                 self.vals[j] * other.vals[k])
             
-            for l in range(len(result["scope"])):
-                assignment[l] = assignment[l] + 1
-                if (assignment[l] == result["card"][l]):
-                    assignment[l] = 0
-                    if result["scope"][l] in self.stride:
-                        j = j - (result["card"][l] - 1) * self.stride[result["scope"][l]]
-                    if result["scope"][l] in other.stride:
-                        k = k - (result["card"][l] - 1) * other.stride[result["scope"][l]]
+            for card, scope in zip(result["card"], result["scope"]):
+                assignment[scope] = assignment.get(scope, 0) + 1
+                if (assignment[scope] == card):
+                    assignment[scope] = 0
+                    if scope in self.stride:
+                        j = j - (card - 1) * self.stride[scope]
+                    if scope in other.stride:
+                        k = k - (card - 1) * other.stride[scope]
                 else:
-                    if result["scope"][l] in self.stride:
-                        j = j + self.stride[result["scope"][l]]
-                    if result["scope"][l] in other.stride:
-                        k = k + other.stride[result["scope"][l]]
+                    if scope in self.stride:
+                        j = j + self.stride[scope]
+                    if scope in other.stride:
+                        k = k + other.stride[scope]
                     break
             
         # add strides
         stride = 1 
-        result["stride"] = dict()
-        for x in range(len(result["scope"])):
-            result["stride"][result["scope"][x]] = (stride)
-            stride *= result["card"][x]
+        result["stride"] = {}
+        for card, scope in zip(result["card"], result["scope"]):
+            result["stride"][scope] = (stride)
+            stride *= card
     
         self.vals = result["vals"]
         self.scope = result["scope"]

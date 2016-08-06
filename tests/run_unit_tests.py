@@ -12,6 +12,7 @@ from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.hybayesiannetwork import HyBayesianNetwork
 from libpgm.nodedata import NodeData, HybridNodeData
 from libpgm.tablecpdfactor import TableCPDFactor
+from libpgm.tablecpdfactor import oldTableCPDFactor
 from libpgm.sampleaggregator import SampleAggregator
 from libpgm.tablecpdfactorization import TableCPDFactorization
 from libpgm.lgbayesiannetwork import LGBayesianNetwork
@@ -146,6 +147,50 @@ class TestTableCPDFactor(unittest.TestCase):
         self.assertEqual(copy.card, self.factor.card)
         self.assertEqual(copy.scope, self.factor.scope)
         self.assertEqual(copy.stride, self.factor.stride)
+
+class TestRegressionTableCPDFactor(unittest.TestCase):
+    def setUp(self):
+        skel = GraphSkeleton()
+        skel.load("unittestdict.txt")
+        skel.toporder()
+        nodedata = NodeData.load("unittestdict.txt")
+        self.instance = DiscreteBayesianNetwork(nodedata)
+        self.oldfactor = oldTableCPDFactor("Grade", self.instance)
+        self.oldfactor2 = oldTableCPDFactor("Letter", self.instance)
+        self.factor = TableCPDFactor("Grade", self.instance)
+        self.factor2 = TableCPDFactor("Letter", self.instance)
+
+    def test_constructor(self):
+        product = 1
+        for var in self.factor.card:
+            product *= var
+        self.assertTrue(len(self.factor.vals) == product)
+        for i in range(1, len(self.factor.scope)):
+            self.assertTrue(self.factor.stride[self.factor.scope[i]] == self.factor.stride[self.factor.scope[i-1]] * self.factor.card[i-1])
+
+    def test_multiplyfactor(self):
+        self.factor.multiplyfactor(self.factor2)
+        self.oldfactor.multiplyfactor(self.oldfactor2)
+        self.assertEqual(self.factor.vals, self.oldfactor.vals)
+        self.assertEqual(self.factor.card, self.oldfactor.card)
+        self.assertEqual(self.factor.scope, self.oldfactor.scope)
+        self.assertEqual(self.factor.stride, self.oldfactor.stride)
+
+    def test_sumout(self):
+        self.factor.sumout("Difficulty")
+        self.oldfactor.sumout("Difficulty")
+        self.assertEqual(self.factor.vals, self.oldfactor.vals)
+        self.assertEqual(self.factor.card, self.oldfactor.card)
+        self.assertEqual(self.factor.scope, self.oldfactor.scope)
+        self.assertEqual(self.factor.stride, self.oldfactor.stride)
+
+    def test_reducefactor(self):
+        self.factor.reducefactor("Difficulty", 'easy')
+        self.oldfactor.reducefactor("Difficulty", 'easy')
+        self.assertEqual(self.factor.vals, self.oldfactor.vals)
+        self.assertEqual(self.factor.card, self.oldfactor.card)
+        self.assertEqual(self.factor.scope, self.oldfactor.scope)
+        self.assertEqual(self.factor.stride, self.oldfactor.stride)
 
 class TestTableCPDFactorization(unittest.TestCase):
 
@@ -335,7 +380,8 @@ class TestPGMLearner(unittest.TestCase):
         result = self.l.discrete_estimatebn(self.samplediscseq)
         self.assertTrue(result.V)
         self.assertTrue(result.E)
-        self.assertTrue(result.Vdata["Difficulty"]["cprob"][0])
+        self.assertTrue(
+            0.0<result.Vdata["Difficulty"]["cprob"][0]<1.0)
 
     def test_lg_estimatebn(self):
         result = self.l.lg_estimatebn(self.samplelgseq)

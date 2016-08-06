@@ -28,7 +28,6 @@ This module provides tools to represent and handle dynamic Bayesian networks wit
 '''
 
 import random
-import sys
 from .graphskeleton import GraphSkeleton
 
 class DynDiscBayesianNetwork(GraphSkeleton):
