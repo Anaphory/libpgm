@@ -275,7 +275,7 @@ class oldTableCPDFactor(object):
         return copy
 
 class TableCPDFactor (oldTableCPDFactor):
-    """ A TableCPDFactor implementation that uses pandas for storage and calculation """
+    """A cleaner TableCPDFactor implementation"""
 
     def multiplyfactor(self, other):  # cf. PGM 359 
         '''Multiply this factor by another Factor
@@ -289,56 +289,101 @@ class TableCPDFactor (oldTableCPDFactor):
             1. *other* -- An instance of :doc:`TableCPDFactor <tablecpdfactor>` class representing the factor to multiply by.
                  
         Attributes modified: 
-            *vals*, *scope*, *stride*, *card* -- Modified to reflect the data of the new product factor.
+            *vals*, *scope*, *stride*, *t_card* -- Modified to reflect the data of the new product factor.
                                                          
         For more information cf. Koller et al. 359.
 
         '''
 
-        result = {}
-        
-        # merge scopes
-        result["scope"] = self.scope
-        result["card"] = self.card
-        for scope, card in zip(other.scope, other.card):
+        # merge t_scopes
+        scope = self.scope
+        card = self.card
+        for t_scope, t_card in zip(other.scope, other.card):
             try:
-                result["scope"].index(scope)
+                scope.index(t_scope)
             except: 
-                result["scope"].append(scope)
-                result["card"].append(card)
+                scope.append(t_scope)
+                card.append(t_card)
     
         # algorithm (see book)
         assignment = {}
-        result["vals"] = []
+        vals = []
         j = 0
         k = 0
-        for _ in range(prod(result["card"])):
-            result["vals"].append(
+        for _ in range(prod(card)):
+            vals.append(
                 self.vals[j] * other.vals[k])
             
-            for card, scope in zip(result["card"], result["scope"]):
-                assignment[scope] = assignment.get(scope, 0) + 1
-                if (assignment[scope] == card):
-                    assignment[scope] = 0
-                    if scope in self.stride:
-                        j = j - (card - 1) * self.stride[scope]
-                    if scope in other.stride:
-                        k = k - (card - 1) * other.stride[scope]
+            for t_card, t_scope in zip(card, scope):
+                assignment[t_scope] = assignment.get(t_scope, 0) + 1
+                if (assignment[t_scope] == t_card):
+                    assignment[t_scope] = 0
+                    if t_scope in self.stride:
+                        j = j - (t_card - 1) * self.stride[t_scope]
+                    if t_scope in other.stride:
+                        k = k - (t_card - 1) * other.stride[t_scope]
                 else:
-                    if scope in self.stride:
-                        j = j + self.stride[scope]
-                    if scope in other.stride:
-                        k = k + other.stride[scope]
+                    if t_scope in self.stride:
+                        j = j + self.stride[t_scope]
+                    if t_scope in other.stride:
+                        k = k + other.stride[t_scope]
                     break
             
         # add strides
-        stride = 1 
-        result["stride"] = {}
-        for card, scope in zip(result["card"], result["scope"]):
-            result["stride"][scope] = (stride)
-            stride *= card
+        t_stride = 1 
+        stride = {}
+        for t_card, t_scope in zip(card, scope):
+            stride[t_scope] = (t_stride)
+            t_stride *= t_card
     
-        self.vals = result["vals"]
-        self.scope = result["scope"]
-        self.card = result["card"]
-        self.stride = result["stride"]
+        self.vals = vals
+        self.scope = scope
+        self.card = card
+        self.stride = stride
+
+    def reducefactor(self, vertex, value=None):
+        '''Sum out the variable specified by *vertex* from the factor.
+
+        Summing out means summing all sets of entries together where
+        *vertex* is the only variable changing in the set. Then
+        *vertex* is removed from the scope of the factor.
+        
+        Arguments:
+            1. *vertex* -- The name of the variable to be summed out.
+        
+        Attributes modified: 
+            *vals*, *scope*, *stride*, *card* -- Modified to reflect the data of the summed-out product factor.
+        
+        For more information see Koller et al. 297.
+
+        '''
+        vscope = self.scope.index(vertex)
+        vstride = self.stride[vertex]
+        vcard = self.card[vscope]
+
+        result = [0 for i in range(len(self.vals)//self.card[vscope])]
+        
+        # machinery that calculates values in summed out factor
+        k = 0
+        lcardproduct = prod(self.card[:vscope])
+        for i, entry in enumerate(result):
+            if value is None:
+                for h in range(vcard):
+                    result[i] += self.vals[k + vstride * h]
+            else:
+                index = self.inputbn.Vdata[vertex]['vals'].index(value)
+                result[i] += self.vals[k + vstride * index]
+                
+            k += 1
+            if (k % lcardproduct == 0):
+                k += (lcardproduct * (vcard - 1))
+        self.vals = result
+        
+        # modify scope, card, and stride in new factor
+        self.scope.remove(vertex)
+        del(self.card[vscope])
+        for i in range(vscope, len(self.stride)-1):
+            self.stride[self.scope[i]] //= vcard
+        del(self.stride[vertex])
+        
+    sumout = reducefactor
