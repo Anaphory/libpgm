@@ -11,31 +11,21 @@
                 "Intelligence"
             ], 
             "variance": 5, 
-            "type": "lg", 
-            "children": [
-                "Letter"
-            ]
+            "type": "lg"
         }, 
         "Intelligence": {
             "mean_base": 50, 
             "mean_scal": [], 
             "parents": [], 
             "variance": 18, 
-            "type": "lg", 
-            "children": [
-                "SAT", 
-                "Grade"
-            ]
+            "type": "lg"
         }, 
         "Difficulty": {
             "mean_base": 50, 
             "mean_scal": [], 
             "parents": [], 
             "variance": 18, 
-            "type": "lg", 
-            "children": [
-                "Grade"
-            ]
+            "type": "lg"
         }, 
         "Letter": {
             "mean_base": -110, 
@@ -46,8 +36,7 @@
                 "Grade"
             ], 
             "variance": 10, 
-            "type": "lg", 
-            "children": []
+            "type": "lg"
         }, 
         "SAT": {
             "mean_base": 10, 
@@ -58,8 +47,7 @@
                 "Intelligence"
             ], 
             "variance": 10, 
-            "type": "lg", 
-            "children": []
+            "type": "lg"
         }
     }
 }

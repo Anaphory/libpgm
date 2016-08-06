@@ -6,9 +6,6 @@
                 "Intelligence"
             ], 
             "type": "lgandd", 
-            "children": [
-                "Letter"
-            ], 
             "hybcprob": {
                 "['high']": {
                     "variance": 10, 
@@ -37,21 +34,14 @@
                 "low", 
                 "high"
             ], 
-            "type": "discrete", 
-            "children": [
-                "SAT", 
-                "Grade"
-            ]
+            "type": "discrete"
         }, 
         "Difficulty": {
             "mean_base": 50, 
             "mean_scal": [], 
             "parents": null, 
             "variance": 18, 
-            "type": "lg", 
-            "children": [
-                "Grade"
-            ]
+            "type": "lg"
         }, 
         "Letter": {
             "mean_base": -110, 
@@ -62,8 +52,7 @@
                 "Grade"
             ], 
             "variance": 10, 
-            "type": "lg", 
-            "children": null
+            "type": "lg"
         }, 
         "SAT": {
             "parents": [

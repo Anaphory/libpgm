@@ -10,7 +10,6 @@
 			"numoutcomes": 2,
 			"vals": ["weak", "strong"],
 			"parents": ["Grade"],
-			"children": [],
 			"cprob": {
 				"['A']": [0.1, 0.9],
 				"['B']": [0.4, 0.6],
@@ -23,7 +22,6 @@
 			"numoutcomes": 2,
 			"vals": ["lowscore", "highscore"],
 			"parents": ["Intelligence"],
-			"children": [],
 			"cprob": {
 				"['low']": [0.95, 0.05],
 				"['high']": [0.2, 0.8]
@@ -35,7 +33,6 @@
 			"numoutcomes": 3,
 			"vals": ["A", "B", "C"],
 			"parents": ["Difficulty", "Intelligence"],
-			"children": ["Letter"],
 			"cprob": {
 				"['easy', 'low']": [0.3, 0.4, 0.3],
 				"['easy', 'high']": [0.9, 0.08, 0.02],
@@ -49,7 +46,6 @@
 			"numoutcomes": 2,
 			"vals": ["low", "high"],
 			"parents": [],
-			"children": ["SAT", "Grade"],
 			"cprob": [0.7, 0.3]
 		},
 		
@@ -58,7 +54,6 @@
 			"numoutcomes": 2,
 			"vals": ["easy", "hard"],
 			"parents": [],
-			"children": ["Grade"],
 			"cprob":  [0.6, 0.4]
 		}
 	}

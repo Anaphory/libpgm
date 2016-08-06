@@ -109,12 +109,11 @@ class NodeData:
         except AttributeError:
             self._E = []
             for (node, properties) in self.Vdata.items():
-                children = properties["children"]
-                for child in children:
-                    self._E.append((node, child))
+                parents = properties["parents"]
+                for parent in parents:
+                    self._E.append((parent, node))
             return self._E
             
-
 class StaticNodeData(NodeData):
     def __init__(self, Vdata={}):
         self.Vdata = Vdata
