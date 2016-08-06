@@ -158,12 +158,8 @@ class DynDiscBayesianNetwork(GraphSkeleton):
                             pvalues.append(str(outcome[parent]))
                     for pvalue in pvalues:
                         assert pvalue != 'default', "Graph skeleton was not topologically graph."
-                    key = str(pvalues)
-                    try:
-                        distribution = Vdataentry["cprob"][key]
-                    except KeyError:
-                        key = key.replace(" ","  ")
-                        distribution = Vdataentry["cprob"][key]
+                    key = tuple(pvalues)
+                    distribution = Vdataentry["cprob"][key]
 
                 # choose interval
                 rand = random.random()

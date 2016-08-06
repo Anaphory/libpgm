@@ -27,6 +27,7 @@ A module for creating and managing node data. Node data in this library can have
 
 '''
 
+import re
 import json
 from . import graphskeleton
 
@@ -82,11 +83,38 @@ class NodeData:
         # try to load both for normal and dynamic cases
         self = k()
         try: 
-            self.Vdata = alldata["Vdata"]
+            self.Vdata = self.parse_cprob(alldata["Vdata"])
         except KeyError:
-            self.initial_Vdata = alldata["initial_Vdata"]
-            self.twotbn_Vdata = alldata["twotbn_Vdata"]
+            self.initial_Vdata = self.parse_cprob(
+                alldata["initial_Vdata"])
+            self.twotbn_Vdata = self.parse_cprob(
+                alldata["twotbn_Vdata"])
         return self
+
+    def parse_cprob(self, vdata):
+        """Parse a cprob dictionary.
+
+        Convert a cprob dictionary provided in json into a dictionary
+        indexed by parent-value tuples.
+
+        """
+
+        inlist = re.compile(r"^\w*\['(.*)'\]\w*$")
+        comma = re.compile(r"', *'")
+        for node, props in vdata.items():
+            new_cprob = {}
+            if "cprob" in props:
+                # It is a discrete node
+                cprob = props["cprob"]
+                try:
+                    for key, ps in cprob.items():
+                        content = inlist.match(key).group(1)
+                        key = tuple(comma.split(content))
+                        new_cprob[key] = ps
+                    props["cprob"] = new_cprob
+                except AttributeError:
+                    pass
+        return vdata
 
     @property
     def V(self):

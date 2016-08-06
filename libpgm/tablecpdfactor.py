@@ -57,26 +57,19 @@ class TableCPDFactor(object):
         # add values
         def explore(_dict, key, depth, totaldepth):
             if depth == totaldepth:
-                try:
-                    for x in _dict[str(key)]:
-                        result["vals"].append(x)
-                except KeyError:
-                    key = str(key)
-                    key = key.replace(" ","  ")
                     for x in _dict[key]:
                         result["vals"].append(x)
-                return
+                    return
             else:
                 for val in bn.Vdata[parents[depth]]["vals"]:
-                    ckey = key[:]
-                    ckey.append(str(val))
+                    ckey = key + (val,)
                     explore(_dict, ckey, depth+1, totaldepth)
                     
         if not parents:
             result["vals"] = bn.Vdata[vertex]["cprob"]
         else: 
             td = len(parents)
-            explore(root, [], 0, td)
+            explore(root, (), 0, td)
         
         # add cardinalities
         result["card"].append(bn.Vdata[vertex]["numoutcomes"])
