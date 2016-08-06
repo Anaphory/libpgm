@@ -47,7 +47,8 @@ class TableCPDFactor(object):
         
         result = dict( vals = [], stride = dict(), card = [], scope = [])
         root = bn.Vdata[vertex]["cprob"]
-        
+
+        parents = bn.Vdata[vertex]["parents"]
         # add values
         def explore(_dict, key, depth, totaldepth):
             if depth == totaldepth:
@@ -61,15 +62,15 @@ class TableCPDFactor(object):
                         result["vals"].append(x)
                 return
             else:
-                for val in bn.Vdata[bn.Vdata[vertex]["parents"][depth]]["vals"]:
+                for val in bn.Vdata[parents[depth]]["vals"]:
                     ckey = key[:]
                     ckey.append(str(val))
                     explore(_dict, ckey, depth+1, totaldepth)
                     
-        if not bn.Vdata[vertex]["parents"]:
+        if not parents:
             result["vals"] = bn.Vdata[vertex]["cprob"]
         else: 
-            td = len(bn.Vdata[vertex]["parents"])
+            td = len(parents)
             explore(root, [], 0, td)
         
         # add cardinalities
@@ -270,6 +271,3 @@ class TableCPDFactor(object):
         copy.scope = self.scope[:]
         copy.card = self.card[:]
         return copy
-    
-        
-    

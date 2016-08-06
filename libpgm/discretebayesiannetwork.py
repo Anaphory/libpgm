@@ -65,7 +65,6 @@ class DiscreteBayesianNetwork(GraphSkeleton):
                         "numoutcomes": <number of possible outcome values>,
                         "vals": ["<name of value 1>", ... , "<name of value n>"],
                         "parents": ["<name of parent 1>", ... , "<name of parent n>"],
-                        "children": ["<name of child 1>", ... , "<name of child n>"],   
                         "cprob": {
                             "['<parent 1, value 1>',...,'<parent n, value 1>']": [<probability of vals[0]>, ... , <probability of vals[n-1]>],
                             ...
