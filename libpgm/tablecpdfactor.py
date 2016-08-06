@@ -314,9 +314,9 @@ class TableCPDFactor (oldTableCPDFactor):
         # add values
         def explore(_dict, key, depth, totaldepth):
             if depth == totaldepth:
-                    for x in _dict[key]:
-                        self.vals.append(x)
-                    return
+                for x in _dict[key]:
+                    self.vals.append(x)
+                return
             else:
                 for val in bn.Vdata[parents[depth]]["vals"]:
                     ckey = key + (val,)
