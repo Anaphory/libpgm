@@ -62,7 +62,6 @@ class DiscreteBayesianNetwork(GraphSkeleton):
                 A dictionary containing CPD data for the nodes of the format:: 
 
                     "vertex": {
-                        "numoutcomes": <number of possible outcome values>,
                         "vals": ["<name of value 1>", ... , "<name of value n>"],
                         "parents": ["<name of parent 1>", ... , "<name of parent n>"],
                         "cprob": {
@@ -195,15 +194,15 @@ class DiscreteBayesianNetwork(GraphSkeleton):
                 rand = random.random()
                 lbound = 0 
                 ubound = 0
-                for interval in range(int(Vdataentry["numoutcomes"])):
+                for interval, val in enumerate(Vdataentry["vals"]):
                     ubound += distribution[interval]
                     if (lbound <= rand and rand < ubound):
-                        rindex = interval
+                        rval = val
                         break
                     else:
                         lbound = ubound 
             
-                return Vdataentry["vals"][rindex]
+                return rval
             
             for s in self.V:
                 if (outcome[s] == "default"):

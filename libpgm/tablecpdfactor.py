@@ -329,10 +329,10 @@ class TableCPDFactor (oldTableCPDFactor):
             explore(root, (), 0, td)
         
         # add self.cardinalities
-        self.card.append(bn.Vdata[vertex]["numoutcomes"])
+        self.card.append(len(bn.Vdata[vertex]["vals"]))
         if (bn.Vdata[vertex]["parents"] != None):
             for parent in reversed(bn.Vdata[vertex]["parents"]):
-                self.card.append(bn.Vdata[parent]["numoutcomes"])
+                self.card.append(len(bn.Vdata[parent]["vals"]))
             
         # add self.scope
         self.scope.append(vertex)
@@ -346,7 +346,7 @@ class TableCPDFactor (oldTableCPDFactor):
         self.stride = dict()
         for x in range(len(self.scope)):
             self.stride[self.scope[x]] = (t_stride)
-            t_stride *= bn.Vdata[self.scope[x]]["numoutcomes"]
+            t_stride *= len(bn.Vdata[self.scope[x]]["vals"])
         
         
 
