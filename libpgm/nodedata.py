@@ -27,25 +27,24 @@ A module for creating and managing node data. Node data in this library can have
 
 '''
 
-from .dictionary import Dictionary
+import json
+from . import graphskeleton
 
-class NodeData(Dictionary):
+class NodeData:
+    '''This class represents the node data for each node in a graph.
+
+    If the Bayesian network is static, it contains the attribute
+    *Vdata*.
+
+    If the Bayesian network is dynamic, it contains two attributes,
+    *initial_Vdata* and *twotbn_Vdata*.
+
+    If the Bayesian network has hybrid CPDs, it contains the
+    additional attribute *nodes*.
+
     '''
-    This class represents the node data for each node in a graph. If the Bayesian network is static, it contains the attribute *Vdata*. If the Bayesian network is dynamic, it contains two attributes, *initial_Vdata* and *twotbn_Vdata*. If the Bayesian network has hybrid CPDs, it contains the additional attribute *nodes*.
-    
-    '''
-    def __init__(self):
-        self.Vdata = None
-        '''A dictionary of node data.'''
-        self.initial_Vdata = None
-        '''In dynamic graphs, a dictionary containing node data for the initial time interval.'''
-        self.twotbn_Vdata = None
-        '''In dynamic graphs, a dictionary containing node data for every time step interval after the first one.'''
-        self.nodes = None
-        '''In hybrid graphs, a dictionary of {key:value} pairs linking the name of each node (the key) to a clas instance (the value) which represents the node, its data, and its sampling function.'''
-
-
-    def load(self, path):
+    @classmethod
+    def load(k, path):
         '''
         Load node data from an input file located at *path*. Input file must be a plaintext .txt file with a JSON-style representation of a dict. The dict must have the top-level key ``Vdata`` or two top-level keys, ``initial_Vdata`` and ``twotbn_Vdata``. For example:: 
 
@@ -78,22 +77,61 @@ class NodeData(Dictionary):
         In the static case, it modifies *Vdata* to hold the dictionary found at path. In the dynamic case, it modifies the *initial_Vdata* and *twotbn_Vdata* attributes to hold the dictionaries found at path.
             
         '''
-        self.dictload(path)
+        alldata = json.load(open(path))
 
         # try to load both for normal and dynamic cases
+        self = k()
         try: 
-            self.Vdata = self.alldata["Vdata"]
+            self.Vdata = alldata["Vdata"]
         except KeyError:
+            self.initial_Vdata = alldata["initial_Vdata"]
+            self.twotbn_Vdata = alldata["twotbn_Vdata"]
+        return self
+
+    @property
+    def V(self):
+        try:
+            return self._graphskeleton.V
+        except AttributeError:
             try:
-                self.initial_Vdata = self.alldata["initial_Vdata"]
-                self.twotbn_Vdata = self.alldata["twotbn_Vdata"]
-            except KeyError:
-                print("Error: NodeData did not recognize input file format.")
+                V = list(self.Vdata)
+            except (TypeError, AttributeError):
+                V = list(self.initialVdata)
+            self._graphskeleton = graphskeleton.GraphSkeleton(V, self.E)
+            self._graphskeleton.toporder()
+            return self._graphskeleton.V
+            
 
+    @property
+    def E(self):
+        try:
+            return self._E
+        except AttributeError:
+            self._E = []
+            for (node, properties) in self.Vdata.items():
+                children = properties["children"]
+                for child in children:
+                    self._E.append((node, child))
+            return self._E
+            
 
-        # free unused memory
-        del self.alldata
+class StaticNodeData(NodeData):
+    def __init__(self, Vdata={}):
+        self.Vdata = Vdata
+        '''A dictionary of node data.'''
 
+class DynamicNodeData(NodeData):
+    def __init__(self, initial_Vdata, dwotbn_Vdata):
+        self.initial_Vdata = {}
+        '''In dynamic graphs, a dictionary containing node data for the initial time interval.'''
+        self.twotbn_Vdata = {}
+        '''In dynamic graphs, a dictionary containing node data for every time step interval after the first one.'''
+
+class HybridNodeData(NodeData):
+    def __init__(self, nodes={}):
+        self.nodes = nodes
+        '''In hybrid graphs, a dictionary of {key:value} pairs linking the name of each node (the key) to a clas instance (the value) which represents the node, its data, and its sampling function.'''
+        
     def entriestoinstances(self):
         '''
         For each node, convert dictionary entry to class instance.
@@ -134,4 +172,3 @@ class NodeData(Dictionary):
             exec("rarray['" + str(entry) + "'] = tmpnode")
 
         self.nodes = rarray
-

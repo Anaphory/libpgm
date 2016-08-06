@@ -26,23 +26,18 @@
 This module provides tools for creating and using graph skeletons for Bayesian networks. A graph skeleton in this case is a vertex set and a directed edge set, with no further information about the specific nodes. 
 
 '''
-from .dictionary import Dictionary
+import json
 
-import sys
-
-class GraphSkeleton(Dictionary):
+class GraphSkeleton:
     '''
     This class represents a graph skeleton, meaning a vertex set and a directed edge set. It contains the attributes *V* and *E*, and the methods *load*, *getparents*, *getchildren*, and *toporder*.
     
     '''
-
-    def __init__(self):
-        self.V = None
+    def __init__(self, V=[], E=[]):
+        self.V = V
         '''A list of names of vertices.'''
-        self.E = None
+        self.E = E
         '''A list of [origin, destination] pairs of vertices that constitute edges.'''
-        self.alldata = None
-        '''(Inherited from dictionary) A variable that stores a key-indexable dictionary once it is loaded from a file.'''
 
     def load(self, path):
         '''
@@ -63,13 +58,11 @@ class GraphSkeleton(Dictionary):
             2. *E* -- The set of edges.
 
         '''
-        self.dictload(path)
-        self.V = self.alldata["V"]
-        self.E = self.alldata["E"]
+        data = json.load(open(path))
 
-        # free unused memory
-        del self.alldata
-        
+        self.V = data['V']
+        self.E = data['E']
+
     def getparents(self, vertex):
         '''
         Return the parents of *vertex* in the graph skeleton.
@@ -148,4 +141,3 @@ class GraphSkeleton(Dictionary):
                         roots.append(m)
         assert (not Ecopy), ("Graph contains a cycle", Ecopy)
         self.V = toporder 
-

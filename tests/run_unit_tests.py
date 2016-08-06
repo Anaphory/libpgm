@@ -6,17 +6,11 @@ Created on Jun 20, 2012
 
 '''
 import unittest
-import sys
 
-# add to PYTHONPATH
-sys.path.append("../")
-
-from libpgm.dictionary import Dictionary
 from libpgm.graphskeleton import GraphSkeleton
-from libpgm.orderedskeleton import OrderedSkeleton
 from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.hybayesiannetwork import HyBayesianNetwork
-from libpgm.nodedata import NodeData
+from libpgm.nodedata import NodeData, HybridNodeData
 from libpgm.tablecpdfactor import TableCPDFactor
 from libpgm.sampleaggregator import SampleAggregator
 from libpgm.tablecpdfactorization import TableCPDFactorization
@@ -27,10 +21,9 @@ from libpgm.pgmlearner import PGMLearner
 class TestNodeData(unittest.TestCase):
 
     def setUp(self):
-        self.nd = NodeData()
+        self.nd = HybridNodeData.load("unittesthdict.txt")
 
     def test_entriestoinstances(self):
-        self.nd.load("unittesthdict.txt")
         self.nd.entriestoinstances()
         result = self.nd.nodes["Intelligence"].choose([])
         self.assertTrue(result == 'low' or result == 'high')
@@ -55,28 +48,14 @@ class TestGraphSkeleton(unittest.TestCase):
         self.assertTrue(self.instance.V.index(5)<self.instance.V.index(1))
         self.assertTrue(self.instance.V.index(5)<self.instance.V.index(2))
 
-class TestOrderedSkeleton(unittest.TestCase):
-
-    def setUp(self):
-        self.os = OrderedSkeleton()
-        self.os.load("unittestdict.txt")
-        self.gs = GraphSkeleton()
-        self.gs.load("unittestdict.txt")
-
-    def test_constructor(self):
-        self.assertNotEqual(self.os.V, self.gs.V)
-        self.gs.toporder()
-        self.assertEqual(self.os.V, self.gs.V)
-
 class TestDiscreteBayesianNetwork(unittest.TestCase):
 
     def setUp(self):
         skel = GraphSkeleton()
         skel.load("unittestdict.txt")
         skel.toporder()
-        nodedata = NodeData()
-        nodedata.load("unittestdict.txt")
-        self.instance = DiscreteBayesianNetwork(skel, nodedata)
+        nodedata = NodeData.load("unittestdict.txt")
+        self.instance = DiscreteBayesianNetwork(nodedata)
 
     def test_randomsample(self):
         randomsample = self.instance.randomsample(5)
@@ -93,13 +72,12 @@ class TestDiscreteBayesianNetwork(unittest.TestCase):
 class TestLGBayesianNetwork(unittest.TestCase):
 
     def setUp(self):
-        nodedata = NodeData()
-        nodedata.load("unittestlgdict.txt")
+        nodedata = NodeData.load("unittestlgdict.txt")
         skel = GraphSkeleton()
         skel.load("unittestdict.txt")
         skel.toporder()
 
-        self.lgb = LGBayesianNetwork(skel, nodedata)
+        self.lgb = LGBayesianNetwork(nodedata)
 
     def test_randomsample(self):
         seq = self.lgb.randomsample(1)
@@ -115,9 +93,8 @@ class TestTableCPDFactor(unittest.TestCase):
         skel = GraphSkeleton()
         skel.load("unittestdict.txt")
         skel.toporder()
-        nodedata = NodeData()
-        nodedata.load("unittestdict.txt")
-        self.instance = DiscreteBayesianNetwork(skel, nodedata)
+        nodedata = NodeData.load("unittestdict.txt")
+        self.instance = DiscreteBayesianNetwork(nodedata)
         self.factor = TableCPDFactor("Grade", self.instance)
         self.factor2 = TableCPDFactor("Letter", self.instance)
 
@@ -176,9 +153,8 @@ class TestTableCPDFactorization(unittest.TestCase):
         skel = GraphSkeleton()
         skel.load("unittestdict.txt")
         skel.toporder()
-        nodedata = NodeData()
-        nodedata.load("unittestdict.txt")
-        self.bn = DiscreteBayesianNetwork(skel, nodedata)
+        nodedata = NodeData.load("unittestdict.txt")
+        self.bn = DiscreteBayesianNetwork(nodedata)
         self.fn = TableCPDFactorization(self.bn)
 
     def test_constructor(self):
@@ -246,9 +222,8 @@ class TestSampleAggregator(unittest.TestCase):
         skel = GraphSkeleton()
         skel.load("unittestdict.txt")
         skel.toporder()
-        nodedata = NodeData()
-        nodedata.load("unittestdict.txt")
-        self.bn = DiscreteBayesianNetwork(skel, nodedata)
+        nodedata = NodeData.load("unittestdict.txt")
+        self.bn = DiscreteBayesianNetwork(nodedata)
         agg = SampleAggregator()
         agg.aggregate(self.bn.randomsample(50))
         self.rseq = agg.seq
@@ -278,8 +253,7 @@ class TestSampleAggregator(unittest.TestCase):
 class TestHyBayesianNetwork(unittest.TestCase):
 
     def setUp(self):
-        self.nd = NodeData()
-        self.nd.load("unittesthdict.txt")
+        self.nd = HybridNodeData.load("unittesthdict.txt")
         self.nd.entriestoinstances()
         self.skel = GraphSkeleton()
         self.skel.load("unittestdict.txt")
@@ -295,8 +269,7 @@ class TestHyBayesianNetwork(unittest.TestCase):
 class TestDynDiscBayesianNetwork(unittest.TestCase):
 
     def setUp(self):
-        self.nd = NodeData()
-        self.nd.load("unittestdyndict.txt")
+        self.nd = NodeData.load("unittestdyndict.txt")
         self.skel = GraphSkeleton()
         self.skel.load("unittestdyndict.txt")
         self.skel.toporder()
@@ -320,15 +293,13 @@ class TestPGMLearner(unittest.TestCase):
         skel.toporder()
 
         # generate sample sequence to try to learn from - discrete
-        nd = NodeData()
-        nd.load("unittestdict.txt")
-        self.samplediscbn = DiscreteBayesianNetwork(skel, nd)
+        nd = NodeData.load("unittestdict.txt")
+        self.samplediscbn = DiscreteBayesianNetwork(nd)
         self.samplediscseq = self.samplediscbn.randomsample(5000)
 
         # generate sample sequence to try to learn from - discrete
-        nda = NodeData()
-        nda.load("unittestlgdict.txt")
-        self.samplelgbn = LGBayesianNetwork(skel, nda)
+        nda = NodeData.load("unittestlgdict.txt")
+        self.samplelgbn = LGBayesianNetwork(nda)
         self.samplelgseq = self.samplelgbn.randomsample(10000)
 
         self.skel = skel

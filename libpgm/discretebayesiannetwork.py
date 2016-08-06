@@ -29,42 +29,33 @@ This module provides tools to represent and handle Bayesian networks with discre
 
 import random
 import json
-import sys
-from .utils.libpgmexceptions import *
+from .graphskeleton import GraphSkeleton
 from .utils import bntextutils as bntutils
-from .orderedskeleton import OrderedSkeleton
 from .tablecpdfactorization import TableCPDFactorization
 
-class DiscreteBayesianNetwork(OrderedSkeleton):
+class DiscreteBayesianNetwork(GraphSkeleton):
     '''
     This class represents a Bayesian network with discrete CPD tables. It contains the attributes *V*, *E*, and *Vdata*, as well as the method *randomsample*.   
     
     '''
 
 
-    def __init__(self, orderedskeleton=None, nodedata=None, path=None):
+    def __init__(self, nodedata=None):
         '''
         This class can be called either with or without arguments. If it is called without arguments, none of its attributes are instantiated and it is left to the user to instantiate them manually. If it is called with arguments, the attributes will be loaded directly from the inputs. Note that the user must specify EITHER *nodedata* and *orderedskeleton* OR *path*.
 
             1. *orderedskeleton* -- An instance of the :doc:`OrderedSkeleton <orderedskeleton>` or :doc:`GraphSkeleton <graphskeleton>` (as long as it's ordered) class.
             2. *nodedata* -- An instance of the :doc:`NodeData <nodedata>` class.
-            3. *path* -- The path to a file containing complete, properly formatted json for a discrete Bayesian network. See :doc:`unittestdict` for an example.
         
-        If these arguments are present, all attributes of the class (*V*, *E*, and *Vdata*) will be automatically copied from the graph skeleton and node data inputs.
-
-        This class requires that the *Vdata* attribute gets loaded with a dictionary with node data of the following fomat::
-
-
         Note that additional keys besides the ones listed are possible in the dict of each vertex. For a full example see :doc:`unittestdict`.
 
-        Upon loading, the class will also check that the keys of *Vdata* correspond to the vertices in *V*.
         '''
-        assert not (orderedskeleton and nodedata and path), "specify nodedata and orderedskeleton OR path"
-        if (orderedskeleton != None and nodedata != None):
-            try:
-                self.V = orderedskeleton.V
+        if nodedata is None:
+            raise TypeError()
+        if True:
+                self.V = nodedata.V
                 '''A list of the names of the vertices.'''
-                self.E = orderedskeleton.E
+                self.E = nodedata.E
                 '''A list of [origin, destination] pairs of vertices that make edges.'''
                 self.Vdata = nodedata.Vdata
                 '''
@@ -83,14 +74,14 @@ class DiscreteBayesianNetwork(OrderedSkeleton):
                     }
     
                 '''
-            except:
-                raise Exception("Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata attribute.")
-            # check that inputs match up
-            assert (sorted(self.V) == sorted(self.Vdata.keys())), ("Vertices did not match vertex data:", self.V, self.Vdata.keys())
 
-        if (path): 
-
-            # validate
+    @classmethod
+    def load(c, path):
+            """ Construct a DBN from a file
+ 
+            *path* -- The path to a file containing complete, properly formatted json for a discrete Bayesian network. See :doc:`unittestdict` for an example.
+            """
+                # validate
             with open(path) as f:
                 try:
                     j = json.load(f)
@@ -103,6 +94,7 @@ class DiscreteBayesianNetwork(OrderedSkeleton):
             self.V = j["V"]
             self.E = j["E"]
             self.Vdata = j["Vdata"] 
+
 
     def specificquery(self, query, evidence):
         '''

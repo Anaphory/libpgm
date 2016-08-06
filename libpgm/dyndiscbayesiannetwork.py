@@ -29,19 +29,19 @@ This module provides tools to represent and handle dynamic Bayesian networks wit
 
 import random
 import sys
-from .orderedskeleton import OrderedSkeleton
+from .graphskeleton import GraphSkeleton
 
-class DynDiscBayesianNetwork(OrderedSkeleton):
+class DynDiscBayesianNetwork(GraphSkeleton):
     '''
     This class represents a dynamic Bayesian network with discrete CPD tables. It contains the attributes *V*, *E*, *initial_Vdata*, and *twotbn_Vdata*, and the method *randomsample*.
     
     '''
 
-    def __init__(self, orderedskeleton=None, nodedata=None):
+    def __init__(self, graphskeleton=None, nodedata=None):
         '''
         This class can be called either with or without arguments. If it is called without arguments, none of its attributes are instantiated and it is left to the user to instantiate them manually. If it is called with arguments, the attributes will be loaded directly from the inputs. The arguments must be (in order):
 
-            1. *orderedskeleton* -- An instance of the :doc:`OrderedSkeleton <orderedskeleton>` or :doc:`GraphSkeleton <graphskeleton>` (as long as it's ordered) class.
+            1. *graphskeleton* -- An instance of the :doc:`GraphSkeleton <graphskeleton>` or :doc:`GraphSkeleton <graphskeleton>` (as long as it's graph) class.
             2. *nodedata* -- An instance of the :doc:`NodeData <nodedata>` class.
         
         If these arguments are present, all attributes of the class (*V*, *E*, and *Vdata*) will be automatically copied from the graph skeleton and node data inputs.
@@ -75,11 +75,11 @@ class DynDiscBayesianNetwork(OrderedSkeleton):
         Upon loading, the class will also check that the keys of *Vdata* correspond to the vertices in *V*.
 
         '''
-        if (orderedskeleton != None and nodedata != None):
+        if (graphskeleton != None and nodedata != None):
             try:
-                self.V = orderedskeleton.V
+                self.V = graphskeleton.V
                 '''A list of the names of the vertices.'''
-                self.E = orderedskeleton.E
+                self.E = graphskeleton.E
                 '''A list of [origin, destination] pairs of vertices that make edges.'''
                 self.initial_Vdata = nodedata.initial_Vdata
                 '''A dictionary containing CPD data for the Bayesian network at time interval 0.'''
@@ -157,7 +157,7 @@ class DynDiscBayesianNetwork(OrderedSkeleton):
                         else:
                             pvalues.append(str(outcome[parent]))
                     for pvalue in pvalues:
-                        assert pvalue != 'default', "Graph skeleton was not topologically ordered."
+                        assert pvalue != 'default', "Graph skeleton was not topologically graph."
                     key = str(pvalues)
                     try:
                         distribution = Vdataentry["cprob"][key]

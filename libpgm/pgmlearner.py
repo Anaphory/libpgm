@@ -27,7 +27,6 @@ This module provides tools to generate Bayesian networks that are "learned" from
 
 '''
 import copy
-import json
 import itertools
 try:
     import numpy as np
@@ -40,10 +39,10 @@ except ImportError:
     raise ImportError("scipy is not installed on your system.")
 
 
+from .nodedata import NodeData, StaticNodeData
 from .graphskeleton import GraphSkeleton
 from .discretebayesiannetwork import DiscreteBayesianNetwork
 from .lgbayesiannetwork import LGBayesianNetwork
-from .sampleaggregator import SampleAggregator
 
 class PGMLearner():
     '''
@@ -102,12 +101,9 @@ class PGMLearner():
         assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Second arg must be a list of dicts."
 
         # instantiate Bayesian network, and add parent and children data
-        bn = DiscreteBayesianNetwork()
+        bn = StaticNodeData()
         graphskeleton.toporder()
-        bn.V = graphskeleton.V
-        bn.E = graphskeleton.E
-        bn.Vdata = dict()
-        for vertex in bn.V: 
+        for vertex in graphskeleton.V: 
             bn.Vdata[vertex] = dict()
             bn.Vdata[vertex]["children"] = graphskeleton.getchildren(vertex)
             bn.Vdata[vertex]["parents"] = graphskeleton.getparents(vertex)
@@ -120,6 +116,7 @@ class PGMLearner():
                 bn.Vdata[vertex]["cprob"] = dict()
 
             bn.Vdata[vertex]["numoutcomes"] = 0
+        bn = DiscreteBayesianNetwork(bn)
 
         # determine which outcomes are possible for each node
         for sample in data:
@@ -242,12 +239,9 @@ class PGMLearner():
         assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Second arg must be a list of dicts."
 
         # instantiate Bayesian network, and add parent and children data
-        bn = LGBayesianNetwork()
+        bn = StaticNodeData()
         graphskeleton.toporder()
-        bn.V = graphskeleton.V
-        bn.E = graphskeleton.E
-        bn.Vdata = dict()
-        for vertex in bn.V: 
+        for vertex in graphskeleton.V: 
             bn.Vdata[vertex] = dict()
             bn.Vdata[vertex]["children"] = graphskeleton.getchildren(vertex)
             bn.Vdata[vertex]["parents"] = graphskeleton.getparents(vertex)
@@ -258,6 +252,7 @@ class PGMLearner():
             for parent in bn.Vdata[vertex]["parents"]:
                 bn.Vdata[vertex]["mean_scal"].append(0.0)
             bn.Vdata[vertex]["variance"] = 0.0
+        bn = LGBayesianNetwork(bn)
 
         # make covariance table, array of E[X_i] for each vertex, and table
         # of E[X_i * X_j] for each combination of vertices

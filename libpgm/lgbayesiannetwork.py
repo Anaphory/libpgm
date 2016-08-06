@@ -39,19 +39,19 @@ import random
 import math
 import sys
 
-from .orderedskeleton import OrderedSkeleton
+from .graphskeleton import GraphSkeleton
 
-class LGBayesianNetwork(OrderedSkeleton):
+class LGBayesianNetwork(GraphSkeleton):
     '''
     This class represents a Bayesian network with linear Gaussian CPDs. It contains the attributes *V*, *E*, and *Vdata*, as well as the method *randomsample*. 
    
     '''
 
-    def __init__(self, orderedskeleton=None, nodedata=None):
+    def __init__(self, nodedata={}):
         '''
         This class can be called either with or without arguments. If it is called without arguments, none of its attributes are instantiated and it is left to the user to instantiate them manually. If it is called with arguments, the attributes will be loaded directly from the inputs. The arguments must be (in order):
 
-            1. *orderedskeleton* -- An instance of the :doc:`OrderedSkeleton <orderedskeleton>` or :doc:`GraphSkeleton <graphskeleton>` (as long as it's ordered) class.
+            1. *graphskeleton* -- An instance of the :doc:`GraphSkeleton <orderedskeleton>` or :doc:`GraphSkeleton <graphskeleton>` (as long as it's ordered) class.
             2. *nodedata* -- An instance of the :doc:`NodeData <nodedata>` class.
 
         If these arguments are present, all attributes of the class (*V*, *E*, and *Vdata*) will be automatically copied from the graph skeleton and node data inputs.
@@ -71,18 +71,12 @@ class LGBayesianNetwork(OrderedSkeleton):
         Upon loading, the class will also check that the keys of *Vdata* correspond to the vertices in *V*.
 
         '''
-        if (orderedskeleton != None and nodedata != None):
-            try:
-                self.V = orderedskeleton.V
-                '''A list of the names of the vertices.'''
-                self.E = orderedskeleton.E
-                '''A list of [origin, destination] pairs of vertices that make edges.'''
-                self.Vdata = nodedata.Vdata
-                '''A dictionary containing CPD data for the nodes.'''
-            except: 
-                raise Exception("Inputs were malformed; first arg must contain V and E attributes and second arg must contain Vdata attribute.")
-
-            assert sorted(self.V) == sorted(self.Vdata.keys()), "Vertices did not match node data"
+        self.V = nodedata.V
+        '''A list of the names of the vertices.'''
+        self.E = nodedata.E
+        '''A list of [origin, destination] pairs of vertices that make edges.'''
+        self.Vdata = nodedata.Vdata
+        '''A dictionary containing CPD data for the nodes.'''
 
     def randomsample(self, n, evidence=None, mode="normal"):
         '''
@@ -148,7 +142,7 @@ class LGBayesianNetwork(OrderedSkeleton):
                 if (self.Vdata[s]["parents"] != None):
                     for x in range(len(self.Vdata[s]["parents"])):
                         parent = self.Vdata[s]["parents"][x]
-                        assert outcome[parent] != 'default', "Graph skeleton was not topologically ordered."
+                        assert outcome[parent] != 'default', "Graph skeleton was not topologically graph."
                         mean += outcome[parent] * self.Vdata[s]["mean_scal"][x]
                 variance = self.Vdata[s]["variance"]
 

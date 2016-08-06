@@ -29,12 +29,9 @@ This method allows for the construction of a Bayesian network with every combina
 
 '''
 
-import random
-import sys
+from .graphskeleton import GraphSkeleton
 
-from .orderedskeleton import OrderedSkeleton
-
-class HyBayesianNetwork(OrderedSkeleton):
+class HyBayesianNetwork(GraphSkeleton):
     '''
     This class represents a Bayesian network with CPDs of any type. The nodes of the Bayesian network are stored first in a dictionary, specifying their "type", which should be descriptive ('discrete', 'lg', etc.). Furthermore, the types of each node associate them with a class found in ``libpgm/CPDtypes/``. The nodes are then stored also as instances of classes found in this directory. The purpose of this is that each node has its own method for being sampled given the outcomes of its parents.
     

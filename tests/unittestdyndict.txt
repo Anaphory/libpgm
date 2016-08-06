@@ -10,11 +10,11 @@
 			"numoutcomes": 2,
 			"vals": ["weak", "strong"],
 			"parents": ["Grade"],
-			"children": None,
+			"children": [],
 			"cprob": {
-				"['A']": [.1, .9],
-				"['B']": [.4, .6],
-				"['C']": [.99, .01]
+				"['A']": [0.1, 0.9],
+				"['B']": [0.4, 0.6],
+				"['C']": [0.99, 0.01]
 			}
 		},
 		
@@ -23,10 +23,10 @@
 			"numoutcomes": 2,
 			"vals": ["lowscore", "highscore"],
 			"parents": ["Intelligence"],
-			"children": None,
+			"children": [],
 			"cprob": {
-				"['low']": [.95, .05],
-				"['high']": [.2, .8]
+				"['low']": [0.95, 0.05],
+				"['high']": [0.2, 0.8]
 			}
 		},
 		
@@ -37,10 +37,10 @@
 			"parents": ["Difficulty", "Intelligence"],
 			"children": ["Letter"],
 			"cprob": {
-				"['easy', 'low']": [.3, .4, .3],
-				"['easy', 'high']": [.9, .08, .02],
-                "['hard', 'low']": [.05, .25, .7],
-                "['hard', 'high']": [.5, .3, .2]
+				"['easy', 'low']": [0.3, 0.4, 0.3],
+				"['easy', 'high']": [0.9, 0.08, 0.02],
+                "['hard', 'low']": [0.05, 0.25, 0.7],
+                "['hard', 'high']": [0.5, 0.3, 0.2]
             }
 		},
 		
@@ -48,18 +48,18 @@
 			"ord": 1,
 			"numoutcomes": 2,
 			"vals": ["low", "high"],
-			"parents": None,
+			"parents": [],
 			"children": ["SAT", "Grade"],
-			"cprob": [.7, .3]
+			"cprob": [0.7, 0.3]
 		},
 		
 		"Difficulty": {
 			"ord": 0,
 			"numoutcomes": 2,
 			"vals": ["easy", "hard"],
-			"parents": None,
+			"parents": [],
 			"children": ["Grade"],
-			"cprob":  [.6, .4]
+			"cprob":  [0.6, 0.4]
 		}
 	},
 	"twotbn_Vdata": {
@@ -68,26 +68,26 @@
 			"numoutcomes": 2,
 			"vals": ["weak", "strong"],
 			"parents": ["past_Grade", "past_Letter", "Grade"],
-			"children": None,
+			"children": [],
 			"cprob": {
-				"['A', 'weak', 'A']": [.1, .9],
-				"['A', 'weak', 'B']": [.15, .85],
-				"['A', 'weak', 'C']": [.05, .95],
-				"['A', 'strong', 'A']": [.1, .9],
-				"['A', 'strong', 'B']": [.1, .9],
-				"['A', 'strong', 'C']": [.1, .9],
-				"['B', 'weak', 'A']": [.47, .53],
-				"['B', 'weak', 'B']": [.4, .6],
-				"['B', 'weak', 'C']": [.4, .6],
-				"['B', 'strong', 'A']": [.4, .6],
-				"['B', 'strong', 'B']": [.41, .59],
-				"['B', 'strong', 'C']": [.42, .58],
-				"['C', 'weak', 'A']": [.99, .01],
-				"['C', 'weak', 'B']": [.99, .01],
-				"['C', 'weak', 'C']": [.99, .01],
-				"['C', 'strong', 'A']": [.99, .01],
-				"['C', 'strong', 'B']": [.99, .01],
-				"['C', 'strong', 'C']": [.99, .01]
+				"['A', 'weak', 'A']": [0.1, 0.9],
+				"['A', 'weak', 'B']": [0.15, 0.85],
+				"['A', 'weak', 'C']": [0.05, 0.95],
+				"['A', 'strong', 'A']": [0.1, 0.9],
+				"['A', 'strong', 'B']": [0.1, 0.9],
+				"['A', 'strong', 'C']": [0.1, 0.9],
+				"['B', 'weak', 'A']": [0.47, 0.53],
+				"['B', 'weak', 'B']": [0.4, 0.6],
+				"['B', 'weak', 'C']": [0.4, 0.6],
+				"['B', 'strong', 'A']": [0.4, 0.6],
+				"['B', 'strong', 'B']": [0.41, 0.59],
+				"['B', 'strong', 'C']": [0.42, 0.58],
+				"['C', 'weak', 'A']": [0.99, 0.01],
+				"['C', 'weak', 'B']": [0.99, 0.01],
+				"['C', 'weak', 'C']": [0.99, 0.01],
+				"['C', 'strong', 'A']": [0.99, 0.01],
+				"['C', 'strong', 'B']": [0.99, 0.01],
+				"['C', 'strong', 'C']": [0.99, 0.01]
 			}
 		},
 		
@@ -96,10 +96,10 @@
 			"numoutcomes": 2,
 			"vals": ["lowscore", "highscore"],
 			"parents": ["Intelligence"],
-			"children": None,
+			"children": [],
 			"cprob": {
-				"['low']": [.95, .05],
-				"['high']": [.2, .8]
+				"['low']": [0.95, 0.05],
+				"['high']": [0.2, 0.8]
 			}
 		},
 		
@@ -110,10 +110,10 @@
 			"parents": ["Difficulty", "Intelligence"],
 			"children": ["Letter"],
 			"cprob": {
-				"['easy', 'low']": [.3, .4, .3],
-				"['easy', 'high']": [.9, .08, .02],
-                "['hard', 'low']": [.05, .25, .7],
-                "['hard', 'high']": [.5, .3, .2]
+				"['easy', 'low']": [0.3, 0.4, 0.3],
+				"['easy', 'high']": [0.9, 0.08, 0.02],
+                "['hard', 'low']": [0.05, 0.25, 0.7],
+                "['hard', 'high']": [0.5, 0.3, 0.2]
             }
 		},
 		
@@ -124,8 +124,8 @@
 			"parents": ["past_Intelligence"],
 			"children": ["SAT", "Grade"],
 			"cprob": {
-                "['high']": [.7, .3],
-                "['low']": [.7, .3]
+                "['high']": [0.7, 0.3],
+                "['low']": [0.7, 0.3]
             }
 		},
 		

@@ -19,7 +19,7 @@
         "Intelligence": {
             "mean_base": 50, 
             "mean_scal": [], 
-            "parents": null, 
+            "parents": [], 
             "variance": 18, 
             "type": "lg", 
             "children": [
@@ -30,7 +30,7 @@
         "Difficulty": {
             "mean_base": 50, 
             "mean_scal": [], 
-            "parents": null, 
+            "parents": [], 
             "variance": 18, 
             "type": "lg", 
             "children": [
@@ -47,7 +47,7 @@
             ], 
             "variance": 10, 
             "type": "lg", 
-            "children": null
+            "children": []
         }, 
         "SAT": {
             "mean_base": 10, 
@@ -59,7 +59,7 @@
             ], 
             "variance": 10, 
             "type": "lg", 
-            "children": null
+            "children": []
         }
     }
 }
