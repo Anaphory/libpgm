@@ -39,6 +39,8 @@ def prod(l):
 
 class oldTableCPDFactor(object):
     '''
+    DEPRECATED
+
     This class represents a factorized representation of a conditional probability distribution table. It contains the attributes *inputvertex*, *inputbn*, *vals*, *scope*, *stride*, and *card*, and the methods *multiplyfactor*, *sumout*, *reducefactor*, and *copy*. 
 
     '''
@@ -274,7 +276,7 @@ class oldTableCPDFactor(object):
         copy.card = self.card[:]
         return copy
 
-class TableCPDFactor (oldTableCPDFactor):
+class TableCPDFactor:
     """Factorized representation of a CPD table.
 
     This class represents a factorized representation of a conditional
@@ -460,3 +462,13 @@ class TableCPDFactor (oldTableCPDFactor):
         del(self.stride[vertex])
         
     sumout = reducefactor
+
+    def copy(self):
+        '''Return a copy of the factor.'''
+        copy = type(self)(self.inputvertex, self.inputbn)
+        copy.vals = self.vals[:]
+        copy.stride = self.stride.copy()
+        copy.scope = self.scope[:]
+        copy.card = self.card[:]
+        return copy
+
