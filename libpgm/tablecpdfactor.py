@@ -28,9 +28,16 @@ representations in :doc:`tablecpdfactorization`.
 
 '''
 
-import sys 
+import sys
 
-class TableCPDFactor(object):
+def prod(l):
+    """ Calculate the product of the iterable l """
+    r = 1
+    for x in l:
+        r *= x
+    return r
+
+class oldTableCPDFactor(object):
     '''
     This class represents a factorized representation of a conditional probability distribution table. It contains the attributes *inputvertex*, *inputbn*, *vals*, *scope*, *stride*, and *card*, and the methods *multiplyfactor*, *sumout*, *reducefactor*, and *copy*. 
 
@@ -99,7 +106,7 @@ class TableCPDFactor(object):
         '''A list of the cardinalities of each vertex in scope, where cardinality is the number of values that the vertex may take. The cardinalities are indexed according to the vertex's index in *scope*.'''
         self.stride = result["stride"]
         '''A dict of {vertex: value} pairs for each vertex in *scope*, where vertex is the name of the vertex and value is the stride of that vertex in the *vals* array.'''
-
+        
     def multiplyfactor(self, other):  # cf. PGM 359 
         '''
         Multiply the factor by another :doc:`TableCPDFactor <tablecpdfactor>`. Multiplying factors means taking the union of the scopes, and for each combination of variables in the scope, multiplying together the probabilities from each factor that that combination will be found.
@@ -215,7 +222,7 @@ class TableCPDFactor(object):
         self.scope.remove(vertex)
         del(self.card[vscope])
         for i in range(vscope, len(self.stride)-1):
-            self.stride[self.scope[i]] /= vcard
+            self.stride[self.scope[i]] //= vcard
         del(self.stride[vertex])
         
     def reducefactor(self, vertex, value):
@@ -258,14 +265,86 @@ class TableCPDFactor(object):
         self.scope.remove(vertex)
         del(self.card[vscope])
         for i in range(vscope, len(self.stride)-1):
-            self.stride[self.scope[i]] /= vcard
+            self.stride[self.scope[i]] //= vcard
         del(self.stride[vertex])
     
     def copy(self):
         '''Return a copy of the factor.'''
-        copy = TableCPDFactor(self.inputvertex, self.inputbn)
+        copy = type(self)(self.inputvertex, self.inputbn)
         copy.vals = self.vals[:]
         copy.stride = self.stride.copy()
         copy.scope = self.scope[:]
         copy.card = self.card[:]
         return copy
+
+class TableCPDFactor (oldTableCPDFactor):
+    """ A TableCPDFactor implementation that uses pandas for storage and calculation """
+
+    def multiplyfactor(self, other):  # cf. PGM 359 
+        '''Multiply this factor by another Factor
+
+        Multiplying factors means taking the union of the scopes, and
+        for each combination of variables in the scope, multiplying
+        together the probabilities from each factor that that
+        combination will be found.
+        
+        Arguments:
+            1. *other* -- An instance of :doc:`TableCPDFactor <tablecpdfactor>` class representing the factor to multiply by.
+                 
+        Attributes modified: 
+            *vals*, *scope*, *stride*, *card* -- Modified to reflect the data of the new product factor.
+                                                         
+        For more information cf. Koller et al. 359.
+
+        '''
+
+        result = {}
+        
+        # merge scopes
+        result["scope"] = self.scope
+        result["card"] = self.card
+        for scope, card in zip(other.scope, other.card):
+            try:
+                result["scope"].index(scope)
+            except: 
+                result["scope"].append(scope)
+                result["card"].append(card)
+    
+        # calculate possible combinations of scope variables
+        possiblevals = prod(result["card"])
+        
+        # algorithm (see book)
+        assignment = [0 for l in result["scope"]]
+        result["vals"] = []
+        j = 0
+        k = 0
+        for _ in range(possiblevals):
+            result["vals"].append(
+                self.vals[j] * other.vals[k])
+            
+            for l in range(len(result["scope"])):
+                assignment[l] = assignment[l] + 1
+                if (assignment[l] == result["card"][l]):
+                    assignment[l] = 0
+                    if result["scope"][l] in self.stride:
+                        j = j - (result["card"][l] - 1) * self.stride[result["scope"][l]]
+                    if result["scope"][l] in other.stride:
+                        k = k - (result["card"][l] - 1) * other.stride[result["scope"][l]]
+                else:
+                    if result["scope"][l] in self.stride:
+                        j = j + self.stride[result["scope"][l]]
+                    if result["scope"][l] in other.stride:
+                        k = k + other.stride[result["scope"][l]]
+                    break
+            
+        # add strides
+        stride = 1 
+        result["stride"] = dict()
+        for x in range(len(result["scope"])):
+            result["stride"][result["scope"][x]] = (stride)
+            stride *= result["card"][x]
+    
+        self.vals = result["vals"]
+        self.scope = result["scope"]
+        self.card = result["card"]
+        self.stride = result["stride"]
