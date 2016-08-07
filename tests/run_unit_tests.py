@@ -12,7 +12,7 @@ from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
 from libpgm.hybayesiannetwork import HyBayesianNetwork
 from libpgm.nodedata import NodeData, HybridNodeData
 from libpgm.tablecpdfactor import TableCPDFactor
-from libpgm.tablecpdfactor import oldTableCPDFactor
+from libpgm.deprecated import oldTableCPDFactor
 from libpgm.sampleaggregator import SampleAggregator
 from libpgm.tablecpdfactorization import TableCPDFactorization
 from libpgm.lgbayesiannetwork import LGBayesianNetwork
@@ -235,7 +235,7 @@ class TestTableCPDFactorization(unittest.TestCase):
         self.fn.sumproductve(input)
         exp = [.498, .502]
         for x in range(2):
-            self.assertTrue(abs(self.fn.factorlist.vals[x] - exp[x]) < .01)
+            self.assertTrue(abs(self.fn.factorlist[0].vals[x] - exp[x]) < .01)
 
     def test_condprobve(self):
         evidence = dict(Grade='C', SAT='highscore')
@@ -244,7 +244,7 @@ class TestTableCPDFactorization(unittest.TestCase):
         self.fn.condprobve(query, evidence)
         exp = [.422, .578]
         for x in range(2):
-            self.assertTrue(abs(self.fn.factorlist.vals[x] - exp[x]) < .01)
+            self.assertTrue(abs(self.fn.factorlist[0].vals[x] - exp[x]) < .01)
 
     def test_specificquery(self):
         evidence = dict(Difficulty='easy')

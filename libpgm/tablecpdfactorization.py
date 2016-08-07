@@ -122,7 +122,7 @@ class TableCPDFactorization():
         for i in range(1, len(self.factorlist)):
             self.factorlist[0].multiplyfactor(self.factorlist[i])
         
-        self.factorlist = self.factorlist[0]
+        self.factorlist = [self.factorlist[0]]
         
     def condprobve(self, query, evidence=None):
         '''
@@ -201,16 +201,18 @@ class TableCPDFactorization():
         # eliminate all necessary variables in the new factor set to produce result
         self.sumproductve(eliminate)
         
+        factor = self.factorlist[0]
+        
         # normalize result
         summ = 0
-        lngth = len(self.factorlist.vals)
+        lngth = len(factor.vals)
         for x in range(lngth):
-            summ += self.factorlist.vals[x]
+            summ += factor.vals[x]
         for x in range(lngth):
-            self.factorlist.vals[x] /= summ
+            factor.vals[x] /= summ
             
         # return table
-        return self.factorlist
+        return factor
 
     def specificquery(self, query, evidence=None):
         '''
@@ -296,7 +298,7 @@ class TableCPDFactorization():
             visited[var] = True 
         
             for x in range(len(rindices[var])):
-                newindex = index + rindices[var][x] * self.factorlist.stride[var]
+                newindex = index + rindices[var][x] * self.factorlist[0].stride[var]
                 if (list(visited.values()).count(False) > 0):
                     i = list(visited.values()).index(False)
                     nextvar = list(visited.keys())[i]
@@ -313,7 +315,7 @@ class TableCPDFactorization():
         # sum entries
         fanswer = 0
         for findex in findices:
-            fanswer += self.factorlist.vals[findex]
+            fanswer += self.factorlist[0].vals[findex]
             
         # return result
         return fanswer
