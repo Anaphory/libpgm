@@ -35,15 +35,13 @@ class TableCPDFactorization (old):
     This class represents a factorized Bayesian network with discrete
     CPD tables. 
     '''
-    def sumproductve(self, vertices):
-        '''
-        Eliminate each vertex in *vertices* from *factorlist* using *sumproducteliminatevar*.
-        
-        Arguments:
-            1. *vertices* -- A list of UUIDs of vertices to be eliminated.
-        
-        Returns:
-            1. *factor* -- the resulting single TableCPDFactor
+    def sumproductve(self,
+                     vertices: "A sequence of UUIDs of vertices to be eliminated."
+    ) -> "the resulting single TableCPDFactor":
+        '''Eliminate each vertex in *vertices* from *factorlist*
+
+        Using *sumproducteliminatevar*, remove all vertices in the
+        sequence from self.factorlist
 
         '''
     
@@ -57,6 +55,39 @@ class TableCPDFactorization (old):
             result.multiplyfactor(self.factorlist[i])
         
         return result
+
+    def condition(self,
+                  evidence: "A dictionary of {node name: value} mappings",
+                  in_place: "If True, write the changes back to self.factorlist." = False,
+                  reset_before: "If True, reset all evidence before adding this, otherwise keep old evidence." = False
+    ) -> "the resulting factorlist":
+        """Create a factorlist reflecting evidence.
+        
+        Adjust all distributions in self.factorlist for the evidence
+        given, and return the resulting new factorlist.
+
+        """
+
+        if reset_before:
+            self.reset()
+
+        factorlist = self.factorlist[:]
+        
+        # modify factors to account for the evidence
+        for vertex, value in evidence.items():
+            factorlist = [
+                factor.reducefactor(vertex, value)
+                if (factor.scope.count(vertex) > 0)
+                else factor
+                for factor in factorlist]
+            # Eliminate skope-free vertices
+            factorlist = [factor for factor in factorlist
+                          if factor.scope]
+
+        if in_place:
+            self.factorlist = factorlist
+
+        return factorlist
   
     def condprobve(self, query, evidence={}):
         '''Calculate the conditional probabilities for *query*.
@@ -114,23 +145,12 @@ class TableCPDFactorization (old):
 
         '''
 
+        self.condition(evidence, in_place=True)
+                   
         eliminate = [vertex for vertex in self.bn.V
                      if vertex not in query
                      if vertex not in evidence]
 
-        factorlist = self.factorlist[:]
-        
-        # modify factors to account for the evidence
-        for vertex, value in evidence.items():
-            factorlist = [
-                factor.reducefactor(vertex, value)
-                if (factor.scope.count(vertex) > 0)
-                else factor
-                for factor in factorlist]
-            # Eliminate skope-free vertices
-            factorlist = [factor for factor in factorlist
-                          if factor.scope]
-                    
         # eliminate all necessary variables in the new factor set to produce result
         factor = self.sumproductve(eliminate)
         
@@ -205,16 +225,17 @@ class TableCPDFactorization (old):
         # is "A" and "Intelligence" is "High"). because must loop once for each 
         # variable, and we don't know how many variables there are, we use 
         # recursion to iterate through the variables
-        visited = dict()
-        rindices = dict()
+        visited = {}
+        rindices = {}
         findices = []
         
         # find corresponding numbers to possible values, store in rindices
-        for var in query.keys():
+        for var, alternatives in query.items():
             rindices[var] = []
             visited[var] = False
-            for poss in query[var]:
-                rindices[var].append(self.bn.Vdata[var]["vals"].index(poss))
+            for alternative_value in alternatives:
+                # Look the alternative_value up in the Bayesian network and get its index
+                rindices[var].append(self.bn.Vdata[var]["vals"].index(alternative_value))
         
         # define function to help iterate recursively through all combinations of variables
         def findentry(var, index):
