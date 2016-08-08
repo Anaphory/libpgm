@@ -52,11 +52,11 @@ class TableCPDFactorization (old):
             self.sumproducteliminatevar(vertex)
         
         # multiply together if many factors remain 
+        result = self.factorlist[0].copy()
         for i in range(1, len(self.factorlist)):
-            self.factorlist[0].multiplyfactor(self.factorlist[i])
+            result.multiplyfactor(self.factorlist[i])
         
-        self.factorlist = [self.factorlist[0]]
-        return self.factorlist[0]
+        return result
   
     def condprobve(self, query, evidence={}):
         '''Calculate the conditional probabilities for *query*.
@@ -141,4 +141,105 @@ class TableCPDFactorization (old):
             
         # return table
         return factor
+    
+    def specificquery(self, query, evidence=None):
+        '''
+        Eliminate all variables except for the ones specified by *query*. Adjust all distributions to reflect *evidence*. Return the entry that matches the exact probability of a specific event, as specified by *query*.
+        
+        Arguments:
+            1. *query* -- A dict containing (key: value) pairs reflecting (variable: value) that represents what outcome to calculate the probability of. The value must be a list of values (for ordinary queries do a list of length one).
+            2. *evidence* -- A dict containing (key: value) pairs reflecting (variable: value) evidence that is known about the system.
+                    
+        Attributes modified:
+            1. *factorlist* -- Modified as in *condprobve*.
+                           
+        The function then chooses the entries of *factorlist* that match the queried event or events. It then operates on them to return the probability that the event (or events) specified will occur, represented as a float between 0 and 1.
+
+        Note that in this function, queries of the type P((x=A or x=B) and (y=C or y=D)) are permitted. They are executed by formatting the *query* dictionary like so::
+
+            {
+                "x": ["A", "B"],
+                "y": ["C", "D"]
+            }
+        
+        Usage example: this code would answer the specific query that vertex ``Grade`` gets outcome ``A`` given that ``Letter`` has outcome ``weak``, in :doc:`this Bayesian network <unittestdict>`::
+
+            import json
+
+            from libpgm.graphskeleton import GraphSkeleton
+            from libpgm.nodedata import NodeData
+            from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
+            from libpgm.tablecpdfactorization import TableCPDFactorization
+            
+            # load nodedata and graphskeleton
+            nd = NodeData()
+            skel = GraphSkeleton()
+            nd.load("../tests/unittestdict.txt")
+            skel.load("../tests/unittestdict.txt")
+
+            # toporder graph skeleton
+            skel.toporder()
+
+            # load evidence
+            evidence = dict(Letter='weak')
+            query = dict(Grade=['A'])
+
+            # load bayesian network
+            bn = DiscreteBayesianNetwork(skel, nd)
+
+            # load factorization
+            fn = TableCPDFactorization(bn)
+
+            # calculate probability distribution
+            result = fn.specificquery(query, evidence)
+
+            # output
+            print result
+
+        '''
+        condprob = self.condprobve(query, evidence)
+
+        # now self.factorlist contains the joint distribution across the
+        # variables designated in query. next, we have to locate the entries
+        # where the variables have values matching the query (e.g., where "Grade"
+        # is "A" and "Intelligence" is "High"). because must loop once for each 
+        # variable, and we don't know how many variables there are, we use 
+        # recursion to iterate through the variables
+        visited = dict()
+        rindices = dict()
+        findices = []
+        
+        # find corresponding numbers to possible values, store in rindices
+        for var in query.keys():
+            rindices[var] = []
+            visited[var] = False
+            for poss in query[var]:
+                rindices[var].append(self.bn.Vdata[var]["vals"].index(poss))
+        
+        # define function to help iterate recursively through all combinations of variables
+        def findentry(var, index):
+            visited[var] = True 
+        
+            for x in range(len(rindices[var])):
+                newindex = index + rindices[var][x] * condprob.stride[var]
+                if (list(visited.values()).count(False) > 0):
+                    i = list(visited.values()).index(False)
+                    nextvar = list(visited.keys())[i]
+                    findentry(nextvar, newindex)
+                else:
+                    # we've accounted for all variable assignments and found an entry
+                    findices.append(newindex)
+            visited[var] = False
+            return
+        
+        # calculate all relevant entries
+        findentry(list(visited.keys())[0], 0)
+            
+        # sum entries
+        fanswer = 0
+        for findex in findices:
+            fanswer += condprob.vals[findex]
+            
+        # return result
+        return fanswer
 

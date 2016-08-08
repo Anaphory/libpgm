@@ -241,10 +241,10 @@ class TestTableCPDFactorization(unittest.TestCase):
         evidence = dict(Grade='C', SAT='highscore')
         query = dict(Intelligence='high')
         self.fn.refresh()
-        self.fn.condprobve(query, evidence)
+        factor = self.fn.condprobve(query, evidence)
         exp = [.422, .578]
         for x in range(2):
-            self.assertTrue(abs(self.fn.factorlist[0].vals[x] - exp[x]) < .01)
+            self.assertTrue(abs(factor.vals[x] - exp[x]) < .01)
 
     def test_specificquery(self):
         evidence = dict(Difficulty='easy')
