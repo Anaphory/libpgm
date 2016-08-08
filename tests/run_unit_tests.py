@@ -119,26 +119,26 @@ class TestTableCPDFactor(unittest.TestCase):
         self.assertEqual(self.factor.stride, d)
 
     def test_sumout(self):
-        self.factor.sumout("Difficulty")
+        factor = self.factor.sumout("Difficulty")
         a = [0.35, 0.65, 1.0, 1.4, 0.38, 0.22]
         b = [3, 2]
         c = ['Grade', 'Intelligence']
         d = {'Grade': 1, 'Intelligence': 3}
-        self.assertEqual(self.factor.vals, a)
-        self.assertEqual(self.factor.card, b)
-        self.assertEqual(self.factor.scope, c)
-        self.assertEqual(self.factor.stride, d)
+        self.assertEqual(factor.vals, a)
+        self.assertEqual(factor.card, b)
+        self.assertEqual(factor.scope, c)
+        self.assertEqual(factor.stride, d)
 
     def test_reducefactor(self):
-        self.factor.reducefactor("Difficulty", 'easy')
+        factor = self.factor.reducefactor("Difficulty", 'easy')
         a = [0.3, 0.4, 0.3, 0.9, 0.08, 0.02]
         b = [3, 2]
         c = ['Grade', 'Intelligence']
         d = {'Grade': 1, 'Intelligence': 3}
-        self.assertEqual(self.factor.vals, a)
-        self.assertEqual(self.factor.card, b)
-        self.assertEqual(self.factor.scope, c)
-        self.assertEqual(self.factor.stride, d)
+        self.assertEqual(factor.vals, a)
+        self.assertEqual(factor.card, b)
+        self.assertEqual(factor.scope, c)
+        self.assertEqual(factor.stride, d)
 
     def test_copy(self):
         copy = self.factor.copy()
@@ -177,20 +177,20 @@ class TestRegressionTableCPDFactor(unittest.TestCase):
         self.assertEqual(self.factor.stride, self.oldfactor.stride)
 
     def test_sumout(self):
-        self.factor.sumout("Difficulty")
+        factor = self.factor.sumout("Difficulty")
         self.oldfactor.sumout("Difficulty")
-        self.assertEqual(self.factor.vals, self.oldfactor.vals)
-        self.assertEqual(self.factor.card, self.oldfactor.card)
-        self.assertEqual(self.factor.scope, self.oldfactor.scope)
-        self.assertEqual(self.factor.stride, self.oldfactor.stride)
+        self.assertEqual(factor.vals, self.oldfactor.vals)
+        self.assertEqual(factor.card, self.oldfactor.card)
+        self.assertEqual(factor.scope, self.oldfactor.scope)
+        self.assertEqual(factor.stride, self.oldfactor.stride)
 
     def test_reducefactor(self):
-        self.factor.reducefactor("Difficulty", 'easy')
+        factor = self.factor.reducefactor("Difficulty", 'easy')
         self.oldfactor.reducefactor("Difficulty", 'easy')
-        self.assertEqual(self.factor.vals, self.oldfactor.vals)
-        self.assertEqual(self.factor.card, self.oldfactor.card)
-        self.assertEqual(self.factor.scope, self.oldfactor.scope)
-        self.assertEqual(self.factor.stride, self.oldfactor.stride)
+        self.assertEqual(factor.vals, self.oldfactor.vals)
+        self.assertEqual(factor.card, self.oldfactor.card)
+        self.assertEqual(factor.scope, self.oldfactor.scope)
+        self.assertEqual(factor.stride, self.oldfactor.stride)
 
 class TestTableCPDFactorization(unittest.TestCase):
 
@@ -224,7 +224,7 @@ class TestTableCPDFactorization(unittest.TestCase):
                 yes += 1
                 index = x
 
-        self.assertTrue(yes == 1)
+        self.assertEqual(yes, 1)
         exp = [0.2, 0.33999999999999997, 0.45999999999999996, 0.74, 0.16799999999999998, 0.09200000000000001]
         for x in range(6):
             self.assertTrue(abs(self.fn.factorlist[index].vals[x] - exp[x]) < .01)

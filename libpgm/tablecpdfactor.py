@@ -221,6 +221,7 @@ class TableCPDFactor:
         for i in range(vscope, len(self.stride)-1):
             self.stride[self.scope[i]] //= vcard
         del(self.stride[vertex])
+        return self
         
     sumout = reducefactor
 

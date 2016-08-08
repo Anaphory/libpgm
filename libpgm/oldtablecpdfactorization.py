@@ -123,6 +123,7 @@ class TableCPDFactorization():
             self.factorlist[0].multiplyfactor(self.factorlist[i])
         
         self.factorlist = [self.factorlist[0]]
+        return self.factorlist[0]
         
     def condprobve(self, query, evidence=None):
         '''
